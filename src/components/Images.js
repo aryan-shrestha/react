@@ -1,75 +1,43 @@
-import Axios from "axios";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import useFetchImage from "../utils/hooks/useFetchImage";
-import useScroll from "../utils/hooks/useScroll";
+import Image from "../components/Image";
+import Loading from "./Loading";
 
 function Images() {
-  const [newImageUrl, setNewImageUrl] = useState("");
   const [page, setPage] = useState(1);
-  const [images, setImages] = useFetchImage(page);
-  const inputRef = useRef(null);
+  const [images, setImages, errors, isLoading] = useFetchImage(page);
+
+  // deletes image
   function handleRemove(index) {
     setImages(images.filter((image, i) => i !== index));
   }
 
-  useEffect(() => {
-    inputRef.current.focus();
-  }, []);
-
   function ShowImage() {
-    return images.map((image, index) => {
-      return (
-        <div
-          className="p-2 my-4 flex justify-center"
-          key={images.indexOf(image)}
-        >
-          <div className="relative">
-            <i
-              className="fas fa-times absolute right-0 cursor-pointer text-gray-300 hover:text-gray-50"
-              onClick={() => {
-                handleRemove(index);
-              }}
-            ></i>
-            <img src={image.urls.regular} width="100%" height="auto" />
-          </div>
-        </div>
-      );
-    });
+    return (
+      <InfiniteScroll
+        dataLength={images.length}
+        next={() => setPage(page + 1)}
+        hasMore={true}
+        className="images-container"
+      >
+        {images.map((img, index) => {
+          return (
+            <Image image={img} handleRemove={handleRemove} index={index} />
+          );
+        })}
+      </InfiniteScroll>
+    );
   }
 
-  function handleChange(event) {
-    setNewImageUrl(event.target.value);
-  }
-
+  // if (isLoading) return <Loading />;
   return (
     <section>
-      <div className="flex justify-center my-4">
-        <input
-          type="text"
-          className="p-1 m-1 border border-gray-800 shadow rounded ml-4"
-          value={newImageUrl}
-          onChange={handleChange}
-          ref={inputRef}
-        />
-        <button
-          className={`p-2  text-white rounded ${
-            newImageUrl !== "" ? "bg-green-600" : "bg-green-300"
-          }`}
-          disabled={newImageUrl === ""}
-        >
-          Add New
-        </button>
-      </div>
-      <div className="gap-0" style={{ columnCount: 5 }}>
-        <ShowImage />
-      </div>
-      <button
-        onClick={() => {
-          setPage(page + 1);
-        }}
-      >
-        Load More
-      </button>
+      {errors[0]}
+
+      <ShowImage />
+
+      {isLoading && <Loading />}
     </section>
   );
 }
