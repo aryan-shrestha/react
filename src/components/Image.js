@@ -9,7 +9,12 @@ function Image(props) {
           props.handleRemove(props.index);
         }}
       ></i>
-      <img src={props.image.urls.regular} width="100%" height="auto" />
+      <img
+        src={props.image.urls.regular}
+        width="100%"
+        height="auto"
+        alt="{props.image.title}"
+      />
     </div>
   );
 }

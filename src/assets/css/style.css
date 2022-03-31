@@ -7,8 +7,14 @@
   gap: 10px;
 }
 
-.images-container {
+.image-container {
   position: relative;
+}
+
+.image-container > img {
+  height: 100%;
+  width: auto;
+  object-fit: cover;
 }
 
 .cross {
@@ -22,4 +28,36 @@
 
 .cross:hover {
   color: rgb(66, 66, 66);
+}
+
+.input-container {
+  width: 50vw;
+  margin: 0 auto;
+  margin-top: 15px;
+  padding: 5px;
+  height: 7vh;
+  position: sticky;
+  top: 15px;
+  display: flex;
+  z-index: 2;
+}
+
+.input-field {
+  flex: 3;
+  opacity: 1;
+  border-radius: 15px;
+  margin-right: 5px;
+  padding: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.444);
+}
+
+.search-btn {
+  flex: 1;
+  background-color: rgb(119, 233, 119);
+  border-radius: 15px;
+  color: #fff;
+}
+
+.search-btn:hover {
+  background-color: rgb(106, 209, 106);
 }
