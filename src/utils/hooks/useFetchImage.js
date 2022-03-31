@@ -9,34 +9,41 @@ function useFetchImage(page, searchTerm) {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  function fetch() {
+    const url =
+      searchTerm === null ? "photos?" : `search/photos?query=${searchTerm}&`;
+    Axios.get(`${api}/${url}client_id=${secret}&page=${page}`)
+      .then((res) => {
+        if (searchTerm === null) {
+          fetchRandom(res);
+        } else {
+          fetchSearch(res);
+        }
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        setErrors(["Unable to fetch Images"]);
+        console.log(e.response);
+        setIsLoading(false);
+      });
+  }
+
+  function fetchSearch(res) {
+    if (page > 1) {
+      setImages([...images, ...res.data.results]);
+    } else {
+      setImages([...res.data.results]);
+    }
+  }
+
+  function fetchRandom(res) {
+    setImages([...images, ...res.data]);
+  }
+
   useEffect(() => {
     setIsLoading(true);
-
-    Axios.get(`${api}/photos?client_id=${secret}&page=${page}`)
-      .then((res) => {
-        setImages([...images, ...res.data]);
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        setErrors(e.response.data);
-        setIsLoading(false);
-      });
-  }, [page]);
-
-  useEffect(() => {
-    if (searchTerm === null || searchTerm === "") return;
-    Axios.get(
-      `${api}/search/photos?client_id=${secret}&page=${page}&query=${searchTerm}`
-    )
-      .then((res) => {
-        setImages([...res.data.results]);
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        setErrors(e.response.data);
-        setIsLoading(false);
-      });
-  }, [searchTerm]);
+    fetch();
+  }, [page, searchTerm]);
 
   return [images, setImages, errors, isLoading];
 }
