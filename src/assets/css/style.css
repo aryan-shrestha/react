@@ -61,3 +61,13 @@
 .search-btn:hover {
   background-color: rgb(106, 209, 106);
 }
+
+.center-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: solid 1px #cfcfcf;
+  border-radius: 15px;
+  padding: 20px;
+}
