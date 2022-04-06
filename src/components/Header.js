@@ -1,7 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { app } from "../config/firebase";
+import { useHistory } from "react-router-dom";
 
 function Header() {
+  const auth = getAuth(app);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const history = useHistory();
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+      }
+    });
+  }, []);
+
+  function logout() {
+    signOut(auth)
+      .then((res) => {
+        history.replace("/login");
+        setIsLoggedIn(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
@@ -27,9 +52,19 @@ function Header() {
             <Link className="nav-link" to="/gallery">
               Gallery
             </Link>
-            <Link className="nav-link" to="/login">
-              Login
-            </Link>
+            {isLoggedIn ? (
+              <p
+                className="nav-link"
+                onClick={logout}
+                style={{ cursor: "pointer" }}
+              >
+                Logout
+              </p>
+            ) : (
+              <Link className="nav-link" to="/login">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </div>

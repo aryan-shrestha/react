@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../config/firebase";
-import { isDisabled } from "@testing-library/user-event/dist/utils";
+import { useHistory } from "react-router-dom";
 
 function Login() {
   const auth = getAuth(app);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const history = useHistory();
 
   function handleSubmit(e) {
     if (isLoading) return;
@@ -16,6 +17,7 @@ function Login() {
     signInWithEmailAndPassword(auth, formData.email, formData.password)
       .then((res) => {
         setIsLoading(false);
+        history.replace("/");
       })
       .catch((err) => {
         setError("Invalid email or password");
