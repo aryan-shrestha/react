@@ -1,31 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "./config/firebase";
 
-import routes from "./utils/routes";
-import "./assets/css/style.css";
 import Header from "./components/Header";
 import AppContext from "./store/AppContext";
-import { Redirect } from "react-router-dom";
+import routes from "./utils/routes/routes";
+import AuthRoute from "./utils/routes/AuthRoute";
+import GuestRoute from "./utils/routes/GuestRoute";
+
+import "./assets/css/style.css";
+import Loading from "./components/Loading";
 
 function App() {
   const auth = getAuth(app);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [user, setUser] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLoggedIn(true);
         setUser(user);
-        console.log(user);
+        setIsLoading(false);
       } else {
         setUser({});
         setIsLoggedIn(false);
+        setIsLoading(false);
       }
     });
   }, []);
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="app">
@@ -34,8 +42,24 @@ function App() {
           <Header />
           <Switch>
             {routes.map((route) => {
-              if(route.path === '/login'){
-                if (isLoggedIn) return <Redirect to="/">
+              if (route.protected === "guest") {
+                return (
+                  <GuestRoute
+                    path={route.path}
+                    exact={route.exact}
+                    component={route.component}
+                  />
+                );
+              }
+
+              if (route.protected === "auth") {
+                return (
+                  <AuthRoute
+                    path={route.path}
+                    exact={route.exact}
+                    component={route.component}
+                  />
+                );
               }
               return (
                 <Route
